@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KIMS Assistant — Kalam Institute of Management Studies</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy: #0f1f3d;
+    --navy-light: #1a3260;
+    --gold: #c9a84c;
+    --gold-light: #e8c97a;
+    --gold-pale: #fdf6e3;
+    --cream: #fafaf7;
+    --white: #ffffff;
+    --text-dark: #1a1a2e;
+    --text-mid: #4a5568;
+    --text-light: #8a95a8;
+    --border: #e2e5ed;
+    --user-bubble: #0f1f3d;
+    --bot-bubble: #ffffff;
+    --shadow: 0 4px 24px rgba(15,31,61,0.10);
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: linear-gradient(135deg, #0f1f3d 0%, #1a3260 40%, #0d2847 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+  }
+
+  .shell {
+    width: 100%;
+    max-width: 860px;
+    height: 92vh;
+    max-height: 820px;
+    display: flex;
+    flex-direction: column;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.5);
+    background: var(--cream);
+  }
+
+  /* ── HEADER ── */
+  .header {
+    background: var(--navy);
+    padding: 0;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 180px; height: 180px;
+    border-radius: 50%;
+    background: rgba(201,168,76,0.08);
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: -40px; left: 30px;
+    width: 120px; height: 120px;
+    border-radius: 50%;
+    background: rgba(201,168,76,0.05);
+  }
+  .header-inner {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 18px 24px;
+    position: relative;
+    z-index: 1;
+  }
+  .logo-circle {
+    width: 48px; height: 48px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--navy);
+    flex-shrink: 0;
+  }
+  .header-text h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--white);
+    letter-spacing: 0.01em;
+    line-height: 1.2;
+  }
+  .header-text p {
+    font-size: 12px;
+    color: var(--gold-light);
+    font-weight: 300;
+    margin-top: 2px;
+    letter-spacing: 0.04em;
+  }
+  .status-dot {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: rgba(255,255,255,0.55);
+  }
+  .dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: #4ade80;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%,100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  /* ── QUICK CHIPS ── */
+  .chips-bar {
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 20px;
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    flex-shrink: 0;
+    scrollbar-width: none;
+  }
+  .chips-bar::-webkit-scrollbar { display: none; }
+  .chip {
+    white-space: nowrap;
+    font-size: 12.5px;
+    font-weight: 400;
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: var(--white);
+    color: var(--text-mid);
+    cursor: pointer;
+    transition: all 0.18s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .chip:hover {
+    background: var(--navy);
+    color: var(--white);
+    border-color: var(--navy);
+  }
+
+  /* ── MESSAGES ── */
+  .messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px 24px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    background: var(--cream);
+    scroll-behavior: smooth;
+  }
+  .messages::-webkit-scrollbar { width: 4px; }
+  .messages::-webkit-scrollbar-track { background: transparent; }
+  .messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+  /* Welcome card */
+  .welcome-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 22px 24px;
+    text-align: center;
+  }
+  .welcome-card .kims-seal {
+    width: 56px; height: 56px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 14px;
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    color: var(--gold);
+  }
+  .welcome-card h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 19px;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 8px;
+  }
+  .welcome-card p {
+    font-size: 13.5px;
+    color: var(--text-mid);
+    line-height: 1.6;
+    max-width: 400px;
+    margin: 0 auto;
+  }
+  .topic-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-top: 16px;
+  }
+  .topic-pill {
+    font-size: 12px;
+    padding: 5px 12px;
+    border-radius: 20px;
+    background: var(--gold-pale);
+    color: #7a5c10;
+    border: 1px solid #e8d89a;
+    font-weight: 400;
+  }
+
+  /* Message rows */
+  .msg-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+    animation: msgIn 0.28s ease-out;
+  }
+  @keyframes msgIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .msg-row.user { flex-direction: row-reverse; }
+
+  .avatar {
+    width: 32px; height: 32px;
+    border-radius: 9px;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px;
+    font-weight: 500;
+  }
+  .avatar.bot {
+    background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+    color: var(--navy);
+    font-family: 'Playfair Display', serif;
+  }
+  .avatar.user-av {
+    background: var(--navy-light);
+    color: var(--white);
+  }
+
+  .bubble {
+    max-width: 68%;
+    padding: 12px 16px;
+    border-radius: 16px;
+    font-size: 14px;
+    line-height: 1.7;
+  }
+  .bubble.bot {
+    background: var(--white);
+    color: var(--text-dark);
+    border: 1px solid var(--border);
+    border-bottom-left-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  .bubble.user {
+    background: var(--user-bubble);
+    color: var(--white);
+    border-bottom-right-radius: 4px;
+  }
+  .bubble.bot strong { font-weight: 500; color: var(--navy); }
+  .bubble.bot ul { padding-left: 18px; margin: 6px 0; }
+  .bubble.bot li { margin-bottom: 4px; }
+  .bubble.bot .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 13px;
+    color: var(--gold);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 4px;
+    display: block;
+  }
+
+  /* Typing indicator */
+  .typing-row { display: flex; align-items: flex-end; gap: 10px; }
+  .typing-bubble {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    border-bottom-left-radius: 4px;
+    padding: 14px 18px;
+    display: flex; gap: 5px; align-items: center;
+  }
+  .typing-bubble span {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--text-light);
+    animation: bounce 1.2s infinite;
+  }
+  .typing-bubble span:nth-child(2) { animation-delay: 0.18s; }
+  .typing-bubble span:nth-child(3) { animation-delay: 0.36s; }
+  @keyframes bounce {
+    0%,60%,100% { transform: translateY(0); }
+    30% { transform: translateY(-6px); }
+  }
+
+  /* ── INPUT AREA ── */
+  .input-area {
+    background: var(--white);
+    border-top: 1px solid var(--border);
+    padding: 14px 20px 16px;
+    flex-shrink: 0;
+  }
+  .input-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    background: var(--cream);
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    padding: 10px 14px;
+    transition: border-color 0.2s;
+  }
+  .input-row:focus-within {
+    border-color: var(--gold);
+    background: var(--white);
+  }
+  #userInput {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--text-dark);
+    outline: none;
+    resize: none;
+    line-height: 1.5;
+    max-height: 120px;
+  }
+  #userInput::placeholder { color: var(--text-light); }
+  .send-btn {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    background: var(--navy);
+    border: none;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.18s;
+    flex-shrink: 0;
+  }
+  .send-btn:hover { background: var(--navy-light); transform: scale(1.05); }
+  .send-btn:disabled { background: var(--border); cursor: not-allowed; transform: none; }
+  .send-btn svg { width: 16px; height: 16px; fill: white; }
+  .input-hint {
+    font-size: 11px;
+    color: var(--text-light);
+    margin-top: 8px;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-inner">
+      <div class="logo-circle">K</div>
+      <div class="header-text">
+        <h1>Kalam Institute of Management Studies</h1>
+        <p>AI-Powered Student Assistance Portal</p>
+      </div>
+      <div class="status-dot">
+        <span class="dot"></span>
+        <span>Online</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUICK CHIPS -->
+  <div class="chips-bar">
+    <button class="chip" onclick="quickAsk('Tell me about BBA admissions at KIMS')">🎓 BBA Admissions</button>
+    <button class="chip" onclick="quickAsk('What is the fee structure for MBA program?')">💰 MBA Fees</button>
+    <button class="chip" onclick="quickAsk('What courses does KIMS offer?')">📚 All Courses</button>
+    <button class="chip" onclick="quickAsk('Tell me about scholarships available at KIMS')">🏆 Scholarships</button>
+    <button class="chip" onclick="quickAsk('Tell me about the faculty at KIMS')">👨‍🏫 Faculty</button>
+    <button class="chip" onclick="quickAsk('What is the last date for admission?')">📅 Deadlines</button>
+    <button class="chip" onclick="quickAsk('What are the eligibility criteria for MBA at KIMS?')">✅ Eligibility</button>
+    <button class="chip" onclick="quickAsk('How do I contact the admissions office at KIMS?')">📞 Contact</button>
+  </div>
+
+  <!-- MESSAGES -->
+  <div class="messages" id="messages">
+    <div class="welcome-card">
+      <div class="kims-seal">K</div>
+      <h2>Welcome to KIMS Assistant</h2>
+      <p>Hello! I'm your dedicated assistant for Kalam Institute of Management Studies. Ask me anything about admissions, fees, courses, faculty, or campus life.</p>
+      <div class="topic-pills">
+        <span class="topic-pill">Admissions & Eligibility</span>
+        <span class="topic-pill">Fees & Scholarships</span>
+        <span class="topic-pill">Courses & Syllabus</span>
+        <span class="topic-pill">Faculty & Departments</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- INPUT -->
+  <div class="input-area">
+    <div class="input-row">
+      <textarea id="userInput" rows="1" placeholder="Ask about admissions, fees, courses, faculty…" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+      <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+        </svg>
+      </button>
+    </div>
+    <p class="input-hint">Powered by Claude AI · KIMS Student Help Desk</p>
+  </div>
+
+</div>
+
+<script>
+const SYSTEM_PROMPT = `You are KIMS Assistant — the official AI-powered help desk chatbot for Kalam Institute of Management Studies (KIMS), a premier management institution offering BBA and MBA programs.
+
+Your role: warmly and accurately answer student and parent queries about KIMS. Be professional yet friendly. Keep answers clear, well-structured, and concise. Use bullet points for lists.
+
+=== KIMS INSTITUTIONAL INFORMATION ===
+
+ABOUT KIMS:
+- Full name: Kalam Institute of Management Studies
+- Named in honour of Dr. A.P.J. Abdul Kalam
+- Type: Private Management College
+- Accreditation: AICTE approved, affiliated to the State University
+- Mission: Nurturing future leaders through excellence in management education
+- Vision: To be a centre of excellence for holistic managerial development
+
+PROGRAMS OFFERED:
+1. BBA (Bachelor of Business Administration) — 3 years / 6 semesters
+   - Specialisations: Marketing, Finance, Human Resources, Entrepreneurship
+2. MBA (Master of Business Administration) — 2 years / 4 semesters
+   - Specialisations: Marketing Management, Financial Management, HR Management, Operations Management, Business Analytics
+3. BBA + MBA (Integrated) — 5 years (available for eligible students)
+
+ELIGIBILITY:
+- BBA: 10+2 / Higher Secondary with minimum 50% marks from any recognized board. No entrance exam required (merit-based). Age: 17–22 years.
+- MBA: Bachelor's degree with minimum 50% marks in any discipline. Valid CAT / MAT / CMAT / KMAT score preferred. Lateral entry available for working professionals.
+- Integrated BBA+MBA: 10+2 with minimum 60% marks.
+
+ADMISSION PROCESS:
+1. Fill the online application form at kims.edu.in (or collect offline from the admissions office)
+2. Submit required documents (mark sheets, ID proof, photos)
+3. Attend a Personal Interview (PI) for MBA applicants
+4. Receive admission offer letter
+5. Pay the fees and confirm seat
+- Application Fee: ₹500 (non-refundable)
+- Important Dates: Applications open January every year; Last date typically June 30; Classes begin July/August
+
+FEES STRUCTURE:
+BBA Program:
+- Tuition Fee: ₹65,000 per year
+- Development Fee: ₹8,000 per year
+- Exam Fee: ₹3,500 per year
+- Total per year: ₹76,500 | Total 3-year: ₹2,29,500
+
+MBA Program:
+- Tuition Fee: ₹95,000 per year
+- Development Fee: ₹10,000 per year
+- Exam Fee: ₹4,000 per year
+- Total per year: ₹1,09,000 | Total 2-year: ₹2,18,000
+
+Integrated BBA+MBA:
+- Total 5-year approx: ₹4,00,000 (discounted combo)
+
+Other Fees (one-time):
+- Admission/Registration fee: ₹2,000
+- Library deposit (refundable): ₹1,500
+- Student activity fund: ₹1,000/year
+
+SCHOLARSHIPS & FINANCIAL AID:
+- Merit Scholarship: Up to 50% tuition waiver for students scoring 90%+ in qualifying exam
+- Sports Quota: Special fee concession for state/national-level athletes
+- Girl Child Scholarship: 25% tuition concession for female students
+- SC/ST/OBC Scholarship: Government scholarship schemes applicable; college assists in form-filling
+- Alumni Referral Discount: ₹5,000 off if referred by a KIMS alumnus
+- EMI Facility: Fees can be paid in 3–4 installments per semester; interest-free
+
+FACULTY & DEPARTMENTS:
+Departments: Marketing, Finance & Accounting, HR & Organisational Behaviour, Operations & Supply Chain, Business Analytics, Entrepreneurship & Innovation, Economics, Communication & Soft Skills
+
+Faculty Highlights:
+- 35+ full-time faculty members
+- Average industry experience: 12 years
+- Many faculty hold Ph.D. from reputed universities (IIMs, NITs, Central Universities)
+- Regular visiting faculty from top corporates: Infosys, HDFC Bank, Deloitte, Amazon
+
+Key Faculty (Sample):
+- Dr. Ramesh Nair (Director) — Ph.D. in Strategic Management, 22 years experience
+- Prof. Sunita Patel (HOD Marketing) — MBA from XLRI, 15 years experience
+- Dr. Arun Mehta (HOD Finance) — Ph.D. Finance, ex-KPMG consultant
+- Prof. Deepa Srinivasan (HR Dept) — MBA HR, certified SHRM professional
+- Dr. Prakash Rao (Business Analytics) — Ph.D. Data Science, ex-TCS
+
+PLACEMENTS:
+- Average placement rate: 92% (last 3 years)
+- Highest CTC: ₹12 LPA | Average CTC: ₹5.4 LPA
+- Top Recruiters: ICICI Bank, HDFC Bank, Amazon, Infosys BPO, Wipro BPS, Godrej, ITC, Reliance Retail, Deloitte, Maruti Suzuki
+- Dedicated Placement Cell with corporate tie-ups
+- Internship opportunities in semester 4 (MBA) and semester 5 (BBA)
+
+CAMPUS & FACILITIES:
+- Campus size: 5-acre modern campus
+- Wi-Fi enabled campus
+- Air-conditioned classrooms and seminar halls
+- Well-stocked library: 25,000+ books, e-journals (EBSCO, JSTOR)
+- Computer lab: 120 systems with latest software (SPSS, Tally, MS Office 365)
+- Separate boys' and girls' hostels
+- Cafeteria, sports ground, gym
+- Innovation & Entrepreneurship Cell
+- MBA Conclave Hall for corporate events
+
+IMPORTANT CONTACTS:
+- Admissions Office: +91-XXXXX-XXXXX
+- Email: admissions@kims.edu.in
+- Website: www.kims.edu.in
+- Address: Kalam Institute of Management Studies, [City], [State] — 5XX XXX
+- Office Hours: Monday–Saturday, 9:00 AM – 5:00 PM
+
+=== BEHAVIOURAL GUIDELINES ===
+- Always be warm, helpful, and precise
+- If a question is outside your knowledge, say so politely and suggest they contact the admissions office
+- Use ₹ symbol for Indian currency
+- Respond in the language the student writes in (English by default)
+- Do not make up information not in the above data
+- For urgent or complex queries, always suggest contacting the admissions office directly`;
+
+const messagesEl = document.getElementById('messages');
+const inputEl = document.getElementById('userInput');
+const sendBtn = document.getElementById('sendBtn');
+let isTyping = false;
+let conversationHistory = [];
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+}
+
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+}
+
+function quickAsk(text) {
+  inputEl.value = text;
+  autoResize(inputEl);
+  sendMessage();
+}
+
+function scrollToBottom() {
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+}
+
+function appendMessage(role, text) {
+  const row = document.createElement('div');
+  row.className = `msg-row ${role}`;
+
+  const av = document.createElement('div');
+  av.className = `avatar ${role === 'user' ? 'user-av' : 'bot'}`;
+  av.textContent = role === 'user' ? 'You' : 'K';
+
+  const bubble = document.createElement('div');
+  bubble.className = `bubble ${role === 'user' ? 'user' : 'bot'}`;
+  bubble.innerHTML = formatText(text);
+
+  row.appendChild(av);
+  row.appendChild(bubble);
+  messagesEl.appendChild(row);
+  scrollToBottom();
+  return bubble;
+}
+
+function formatText(text) {
+  return text
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+    .replace(/^### (.*$)/gm, '<span class="section-title">$1</span>')
+    .replace(/^## (.*$)/gm, '<strong>$1</strong><br>')
+    .replace(/^- (.*$)/gm, '<li>$1</li>')
+    .replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>')
+    .replace(/\n\n/g, '<br><br>')
+    .replace(/\n/g, '<br>');
+}
+
+function showTyping() {
+  const row = document.createElement('div');
+  row.className = 'typing-row';
+  row.id = 'typing-indicator';
+
+  const av = document.createElement('div');
+  av.className = 'avatar bot';
+  av.textContent = 'K';
+
+  const bubble = document.createElement('div');
+  bubble.className = 'typing-bubble';
+  bubble.innerHTML = '<span></span><span></span><span></span>';
+
+  row.appendChild(av);
+  row.appendChild(bubble);
+  messagesEl.appendChild(row);
+  scrollToBottom();
+}
+
+function removeTyping() {
+  const el = document.getElementById('typing-indicator');
+  if (el) el.remove();
+}
+
+async function sendMessage() {
+  const text = inputEl.value.trim();
+  if (!text || isTyping) return;
+
+  inputEl.value = '';
+  inputEl.style.height = 'auto';
+  isTyping = true;
+  sendBtn.disabled = true;
+
+  appendMessage('user', text);
+  conversationHistory.push({ role: 'user', content: text });
+
+  showTyping();
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: SYSTEM_PROMPT,
+        messages: conversationHistory
+      })
+    });
+
+    removeTyping();
+
+    const data = await response.json();
+    const reply = data.content?.[0]?.text || 'Sorry, I could not fetch a response. Please try again.';
+
+    conversationHistory.push({ role: 'assistant', content: reply });
+    appendMessage('bot', reply);
+
+  } catch (err) {
+    removeTyping();
+    appendMessage('bot', 'I\'m having trouble connecting right now. Please try again shortly, or contact our admissions office at **admissions@kims.edu.in**.');
+  }
+
+  isTyping = false;
+  sendBtn.disabled = false;
+  inputEl.focus();
+}
+</script>
+</body>
+</html>
